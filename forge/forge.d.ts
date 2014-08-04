@@ -73,4 +73,19 @@ declare module forge {
         export import sha384 = forge.sha384;
         export import sha512 = forge.sha512;
     }
+
+    interface MaskGenerator {
+        generate(seed: string, maskLen: number): string;
+    }
+
+    interface MGF1 extends MaskGenerator {
+    }
+
+    module mgf1 {
+        function create<T>(md: Hash<>): MGF1;
+    }
+
+    module mgf {
+        export import mgf1 = forge.mgf1;
+    }
 }
