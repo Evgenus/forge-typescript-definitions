@@ -88,4 +88,24 @@ declare module forge {
     module mgf {
         export import mgf1 = forge.mgf1;
     }
+
+    interface HMAC {
+        start(): void;
+        start<T>(md: Hash<T>): void;
+        start<T>(md: Hash<T>, key: string): void;
+        start<T>(md: Hash<T>, key: number[]): void;
+        start<T>(md: Hash<T>, key: ByteBuffer): void;
+        start(md: string): void;
+        start(md: string, key: string): void;
+        start(md: string, key: number[]): void;
+        start(md: string, key: ByteBuffer): void;
+
+        update(bytes: string): void;
+
+        getMac(): ByteBuffer;
+    }
+
+    module hmac {
+        function create(): HMAC;
+    }
 }
