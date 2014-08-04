@@ -11,7 +11,7 @@ declare module forge {
         messageLength64: number[]; // array of 2 numbers
 
         start(): T;
-        update(msg: string, encoding: string): T;
+        update(msg: string, encoding?: string): T;
         digest(): forge.ByteBuffer;
     }
 
@@ -82,7 +82,7 @@ declare module forge {
     }
 
     module mgf1 {
-        function create<T>(md: Hash<>): MGF1;
+        function create<T>(md: Hash<T>): MGF1;
     }
 
     module mgf {
