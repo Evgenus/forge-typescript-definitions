@@ -336,8 +336,14 @@ declare module forge {
         module algorithms {
         }
 
+        interface BlockCipherOptions {
+            algorithm: string;
+            key
+            decrypt: boolean;
+        }
+
         class BlockCipher implements Cipher {
-            constructor(options);
+            constructor(options: BlockCipherOptions);
             start(options): void;
             update(input): void;
             finish(pad): boolean;
@@ -345,8 +351,40 @@ declare module forge {
 
         function createCipher(algorithm, key): BlockCipher;
         function createDecipher(algorithm, key): BlockCipher;
-        function registerAlgorithm(name, algorithm): void;
-        function getAlgorithm(name: string);
+        function registerAlgorithm<T>(name, algorithm: modes.BlockModeFactory<T>): void;
+        function getAlgorithm<T>(name: string): modes.BlockModeFactory<T>;
+
+        module modes {
+            interface BlockModeOptions {
+                cipher: Cipher;
+                blockSize: number;
+            }
+
+            interface EncryptionOptions {
+                iv: any; // string | number[] | ByteBuffer
+                additionalData: string;
+                tagLength: number;
+            }
+
+            interface BlockMode {
+                name: string;
+                cipher: Cipher;
+                start(options: EncryptionOptions): void;
+                encrypt(input, output): void;
+                decrypt(input, output): void;
+            }
+
+            interface ECB extends BlockMode {
+                pad(input, options): boolean;
+                unpad(input, options): boolean;
+            }
+
+            interface BlockModeFactory<T> {
+                new (options: BlockModeOptions): T;
+            }
+
+            var ecb: BlockModeFactory<ECB>;
+        }
     }
 
     module aes {
