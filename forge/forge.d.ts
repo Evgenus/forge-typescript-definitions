@@ -69,6 +69,39 @@ declare module forge {
 
         var ByteBuffer: ByteBufferStatic;
         var ByteStringBuffer: ByteBufferStatic;
+
+        interface DataBuffer extends BufferInterface<DataBuffer> {
+            accommodate(amount: number, growSize?: number): DataBuffer;
+
+            putBytes(bytes: string, encoding?: string): DataBuffer;
+            putBytes(bytes: DataBuffer): DataBuffer;
+            putBytes(bytes: ArrayBuffer, encoding?: string): DataBuffer;
+            putBytes(bytes: ArrayBufferView, encoding?: string): DataBuffer;
+            putBytes<T>(bytes: Array<T>, encoding?: string): DataBuffer;
+
+            putBuffer(bytes: string): DataBuffer;
+            putBuffer(bytes: DataBuffer): DataBuffer;
+            putBuffer(bytes: ArrayBuffer): DataBuffer;
+            putBuffer(bytes: ArrayBufferView): DataBuffer;
+            putBuffer<T>(bytes: Array<T>): DataBuffer;
+        }
+
+        interface DataBufferOptions {
+            readOffset?: number;
+            growSize?: number;
+            writeOffset?: number;
+            encoding?: string;
+        }
+
+        interface DataBufferStatic {
+            new (): DataBuffer;
+            new (b: string, options?: DataBufferOptions): DataBuffer;
+            new (b: DataBuffer, options?: DataBufferOptions): DataBuffer;
+            new (b: ArrayBuffer, options?: DataBufferOptions): DataBuffer;
+            new (b: ArrayBufferView, options?: DataBufferOptions): DataBuffer;
+        }
+
+        var DataBuffer: DataBufferStatic;
     }
 
     interface Hash<T> {
