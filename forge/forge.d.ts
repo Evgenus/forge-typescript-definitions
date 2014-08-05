@@ -180,6 +180,24 @@ declare module forge {
 
         function makeLink(path: string, query?: Object, fragment?: string): string;
         function makeLink(path: string[], query?: Object, fragment?: string): string;
+        function setPath(object: Object, keys: string[], value: string): void;
+        function getPath(object: Object, keys: string[], _default?: string): string;
+        function deletePath(object: Object, keys: string[]): void;
+        function isEmpty(object: Object): boolean;
+        function format(format: string, v1?: any, v2?: any, v3?: any, v4?: any, v5?: any, v6?: any, v7?: any, v8?: any): string;
+        function formatNumber(num: number, decimals?: number, dec_point?: string, thousands_sep?: string): string;
+        function formatSize(size: number): string;
+        function bytesFromIP(ip: string): ByteBuffer;
+        function bytesFromIPv4(ip: string): ByteBuffer;
+        function bytesFromIPv6(ip: string): ByteBuffer;
+        function bytesToIP(bytes: ByteBuffer): string;
+        function bytesToIPv4(bytes: ByteBuffer): string;
+        function bytesToIPv6(bytes: ByteBuffer): string;
+
+        interface EstimateCoresOptions {
+            update?: boolean;
+        }
+        function estimateCores(options: EstimateCoresOptions, callback: (err: Error, max: number) => void): void;
     }
 
     interface Hash<T> {
