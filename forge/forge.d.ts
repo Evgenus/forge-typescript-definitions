@@ -325,4 +325,47 @@ declare module forge {
     module hmac {
         function create(): HMAC;
     }
+
+    interface Cipher {
+        start(options): void;
+        update(input): void;
+        finish(pad): boolean;
+    }
+
+    module cipher {
+        module algorithms {
+        }
+
+        class BlockCipher implements Cipher {
+            constructor(options);
+            start(options): void;
+            update(input): void;
+            finish(pad): boolean;
+        }
+
+        function createCipher(algorithm, key): BlockCipher;
+        function createDecipher(algorithm, key): BlockCipher;
+        function registerAlgorithm(name, algorithm): void;
+        function getAlgorithm(name: string);
+    }
+
+    module aes {
+        function startEncrypting(key, iv, output, mode): Cipher;
+        function createEncryptionCipher(key, mode): Cipher;
+        function startDecrypting(key, iv, output, mode): Cipher;
+        function createDecryptionCipher(key, mode): Cipher;
+
+        interface AlgorithmOptions {
+            key: WTF;
+            decrypt: boolean;
+        }
+
+        class Algorithm {
+            constructor(name: string, mode);
+            initialize(options: AlgorithmOptions): void;
+        }
+
+        function _expandKey(key, decrypt);
+        function _updateBlock(w, input, output, decrypt)
+    }
 }
