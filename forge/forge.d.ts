@@ -63,7 +63,7 @@ declare module forge {
             new (b: string): ByteBuffer;
             new (b: ArrayBuffer): ByteBuffer;
             new (b: ArrayBufferView): ByteBuffer;
-            new<T> (b: Array<T>): ByteBuffer;
+            new <T>(b: Array<T>): ByteBuffer;
             new (b: ByteBuffer): ByteBuffer;
         }
 
@@ -143,6 +143,26 @@ declare module forge {
                 decode(bytes: string): string;
             }
         }
+
+        interface FlashInterface {
+            deflate(data: string): string;
+            inflate(data: string): any;
+
+            removeItem(id: string): void;
+            setItem(id: string, obj: any): void;
+            getItem(id: string): any;
+
+            init: boolean;
+        }
+
+        function deflate(api: FlashInterface, bytes: string, raw: boolean): string;
+        function inflate(api: FlashInterface, bytes: string, raw: boolean): string;
+
+        function setItem(api: FlashInterface, id: string, key: string, data: Object, location: string[]): void;
+        function getItem(api: FlashInterface, id: string, key: string, location: string[]): Object;
+        function removeItem(api: FlashInterface, id: string, key: string, location: string[]): void;
+        function clearItems(api: FlashInterface, id: string, location: string[]): void;
+
         interface URLParts {
             full: string;
             scheme: string;
