@@ -143,6 +143,43 @@ declare module forge {
                 decode(bytes: string): string;
             }
         }
+        interface URLParts {
+            full: string;
+            scheme: string;
+            host: string;
+            fullHost: string;
+            port: number;
+            path: string;
+        }
+
+        function parseUrl(str: string): URLParts;
+
+        function getQueryVariables(query?: string): Object;
+
+        interface FragmentParts {
+            pathString: string;
+            queryString: string;
+            path: string[];
+            query: Object;
+        }
+
+        function parseFragment(fragment: string): Object;
+
+        interface Request {
+            path: string;
+            query: string;
+            getPath(): string[];
+            getPath(i: number): string;
+            getQuery(): Object;
+            getQuery(k: string): string[];
+            getQuery(k: string, i: number): string;
+            getQueryLast(k: string, _default?: string): string;
+        }
+
+        function makeRequest(reqString: string): Request;
+
+        function makeLink(path: string, query?: Object, fragment?: string): string;
+        function makeLink(path: string[], query?: Object, fragment?: string): string;
     }
 
     interface Hash<T> {
