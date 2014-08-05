@@ -1,6 +1,74 @@
 declare module forge {
 
-    interface ByteBuffer {
+    module util {
+        function setImmediate(func: Function): number;
+        function nextTick(func: Function): number;
+        function isArray(x: any): boolean;
+        function isArrayBuffer(x: any): boolean;
+        function isArrayBufferView(x: any): boolean;
+
+        interface BufferInterface<T> {
+            length(): number;
+            isEmpty(): boolean;
+            putByte(b: number): T;
+            fillWithByte(b: number, n: number): T;
+
+            putString(str: string): T;
+
+            putInt16(i: number): T;
+            putInt24(i: number): T;
+            putInt32(i: number): T;
+
+            putInt16Le(i: number): T;
+            putInt24Le(i: number): T;
+            putInt32Le(i: number): T;
+
+            putInt(i: number, n: number): T;
+            putSignedInt(i: number, n: number): T;
+
+            getByte(): number;
+
+            getInt16(): number;
+            getInt24(): number;
+            getInt32(): number;
+
+            getInt16Le(): number;
+            getInt24Le(): number;
+            getInt32Le(): number;
+
+            getInt(n: number): number;
+            getSignedInt(n: number): number;
+
+            getBytes(count: number): string;
+            bytes(count: number): string;
+            at(i: number): number;
+            setAt(i: number, b: number): T;
+            last(): number;
+            copy(): T;
+
+            compact(): T;
+            clear(): T;
+            truncate(count: number): T;
+            toHex(): string;
+            toString(encoding?: number): string
+        }
+
+        interface ByteBuffer extends BufferInterface<ByteBuffer> {
+            putBytes(bytes: string): ByteBuffer;
+            putBuffer<T>(buffer: BufferInterface<T>): ByteBuffer;
+        }
+
+        interface ByteBufferStatic {
+            new (): ByteBuffer;
+            new (b: string): ByteBuffer;
+            new (b: ArrayBuffer): ByteBuffer;
+            new (b: ArrayBufferView): ByteBuffer;
+            new<T> (b: Array<T>): ByteBuffer;
+            new (b: ByteBuffer): ByteBuffer;
+        }
+
+        var ByteBuffer: ByteBufferStatic;
+        var ByteStringBuffer: ByteBufferStatic;
     }
 
     interface Hash<T> {
@@ -12,7 +80,7 @@ declare module forge {
 
         start(): T;
         update(msg: string, encoding?: string): T;
-        digest(): forge.ByteBuffer;
+        digest(): forge.util.ByteBuffer;
     }
 
     interface MD5 extends Hash<MD5> {
@@ -94,15 +162,15 @@ declare module forge {
         start<T>(md: Hash<T>): void;
         start<T>(md: Hash<T>, key: string): void;
         start<T>(md: Hash<T>, key: number[]): void;
-        start<T>(md: Hash<T>, key: ByteBuffer): void;
+        start<T>(md: Hash<T>, key: util.ByteBuffer): void;
         start(md: string): void;
         start(md: string, key: string): void;
         start(md: string, key: number[]): void;
-        start(md: string, key: ByteBuffer): void;
+        start(md: string, key: util.ByteBuffer): void;
 
         update(bytes: string): void;
 
-        getMac(): ByteBuffer;
+        getMac(): util.ByteBuffer;
     }
 
     module hmac {
