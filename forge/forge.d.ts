@@ -113,6 +113,36 @@ declare module forge {
         function decode64(input: string): string;
         function encodeUtf8(str: string): string;
         function decodeUtf8(str: string): string;
+
+        module binary {
+            var raw: {
+                encode(bytes: string): string;
+                decode(str: string): Uint8Array;
+                decode(str: string, output: Uint8Array, offset?: number): number;
+            }
+            var hex: {
+                encode(bytes: string): string;
+                decode(str: string): Uint8Array;
+                decode(str: string, output: Uint8Array, offset?: number): number;
+            }
+            var base64: {
+                encode(bytes: string, maxline?: number): string;
+                decode(str: string): Uint8Array;
+                decode(str: string, output: Uint8Array, offset?: number): number;
+            }
+        }
+        module text {
+            var utf8: {
+                encode(str: string): Uint8Array;
+                encode(str: string, output: Uint8Array, offset?: number): number;
+                decode(bytes: string): string;
+            }
+            var utf16: {
+                encode(str: string): Uint8Array;
+                encode(str: string, output: Uint8Array, offset?: number): number;
+                decode(bytes: string): string;
+            }
+        }
     }
 
     interface Hash<T> {
