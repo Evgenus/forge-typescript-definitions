@@ -102,6 +102,17 @@ declare module forge {
         }
 
         var DataBuffer: DataBufferStatic;
+
+        function createBuffer(input: string, encoding?: string): ByteBuffer;
+        function fillString(c: string, n: number): string;
+        function xorBytes(s1: string, s2: string, n: number);
+        function hexToBytes(hex: string): string;
+        function bytesToHex(bytes: string): string;
+        function int32ToBytes(i: number): string;
+        function encode64(input: string, maxline?: number): string;
+        function decode64(input: string): string;
+        function encodeUtf8(str: string): string;
+        function decodeUtf8(str: string): string;
     }
 
     interface Hash<T> {
