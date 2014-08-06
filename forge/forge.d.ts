@@ -347,7 +347,7 @@ declare module forge {
 
     module cipher {
         interface AlgorithmsDictionary {
-            [name: string]: modes.BlockModeFactory<any>;
+            [name: string]: modes.BlockModeFactory;
         }
 
         var algorithms: AlgorithmsDictionary;
@@ -370,9 +370,8 @@ declare module forge {
 
         function createCipher(algorithm: string, key: string): BlockCipher;
         function createDecipher(algorithm: string, key: string): BlockCipher;
-        function registerAlgorithm<T>(name, algorithm: modes.BlockModeFactory<T>): void;
-        function getAlgorithm(name: string): modes.BlockModeFactory<any>;
-        function getAlgorithm<T>(name: string): modes.BlockModeFactory<T>;
+        function registerAlgorithm(name, algorithm: modes.BlockModeFactory): void;
+        function getAlgorithm(name: string): modes.BlockModeFactory;
 
         module modes {
             interface BlockModeOptions {
@@ -382,59 +381,86 @@ declare module forge {
 
             interface EncryptionOptions {
                 iv: any; // string | number[] | ByteBuffer
-                additionalData: string;
-                tagLength: number;
             }
 
             interface BlockMode {
                 name: string;
                 cipher: Cipher;
                 blockSize: number;
-                tag: util.ByteBuffer;
                 start(options: EncryptionOptions): void;
                 encrypt(input: util.ByteBuffer, output: util.ByteBuffer): void;
                 decrypt(input: util.ByteBuffer, output: util.ByteBuffer): void;
             }
 
-            interface PaddingOptions {
+            interface BlockModeFactory {
+                new (options: BlockModeOptions): BlockMode;
             }
 
-            interface UnpaddingOptions {
-                overflow: number;
+            interface BlockModeFactoryT<T> {
+                new (options: BlockModeOptions): BlockMode;
             }
 
-            interface ECB extends BlockMode {
-                pad(input: util.ByteBuffer, options: PaddingOptions): boolean;
-                unpad(input: util.ByteBuffer, options: UnpaddingOptions): boolean;
+            interface ECB {
+                pad(input: util.ByteBuffer, options: { }): boolean;
+                unpad(input: util.ByteBuffer, options: { overflow: number }): boolean;
             }
 
-            interface CBC extends BlockMode {
-                pad(input: util.ByteBuffer, options: PaddingOptions): boolean;
-                unpad(input: util.ByteBuffer, options: UnpaddingOptions): boolean;
+            interface CBC {
+                pad(input: util.ByteBuffer, options: {}): boolean;
+                unpad(input: util.ByteBuffer, options: { overflow: number }): boolean;
             }
 
-            interface CFB extends BlockMode {
-                afterFinish(output, options)
+            interface CFB {
+                afterFinish(output: util.ByteBuffer, options: { overflow: number }): boolean;
             }
 
-            interface BlockModeFactory<T> {
-                new (options: BlockModeOptions): T;
+            interface OFB {
+                afterFinish(output: util.ByteBuffer, options: { overflow: number }): boolean;
             }
 
-            var ecb: BlockModeFactory<ECB>;
-            var cbc: BlockModeFactory<CBC>;
-            var cfb: BlockModeFactory<CFB>;
+            interface CTR {
+                afterFinish(output: util.ByteBuffer, options: { overflow: number }): boolean;
+            }
+
+            interface GCMEncryptionOptions extends EncryptionOptions {
+                additionalData?: string;
+                tagLength?: number;
+                decrypt?: boolean;
+                tag?: string;
+            }
+
+            interface GCM {
+                tag: util.ByteBuffer;
+
+                start(options: GCMEncryptionOptions): void;
+                afterFinish(output: util.ByteBuffer, options: { overflow: number; decrypt?: boolean }): boolean;
+
+                multiply(x: number[], y: number[]);
+                pow(x: number[], y: number[]);
+                tableMultiply(x: number[]): number[];
+                ghash(h: number[], y: number[], x: number[]): number[];
+                generateHashTable(h: number[], bits: number): number[];
+                generateSubHashTable(mid: number[], bits: number): number[];
+            }
+
+            var ecb: BlockModeFactoryT<ECB>;
+            var cbc: BlockModeFactoryT<CBC>;
+            var cfb: BlockModeFactoryT<CFB>;
+            var ofb: BlockModeFactoryT<OFB>;
+            var ctr: BlockModeFactoryT<CTR>;
+            var gcm: BlockModeFactoryT<GCM>;
         }
     }
 
     module aes {
-        function startEncrypting(key, iv, output, mode): Cipher;
+        function startEncrypting(key: string, iv: string, output: util.ByteBuffer, mode?: string): Cipher;
+
         function createEncryptionCipher(key, mode): Cipher;
         function startDecrypting(key, iv, output, mode): Cipher;
         function createDecryptionCipher(key, mode): Cipher;
 
         interface AlgorithmOptions {
-            key: WTF;
+            key: any; // string | number[] | ByteBuffer
             decrypt: boolean;
         }
 
@@ -453,7 +479,7 @@ declare module forge {
         }
 
         interface PseudoRendomGenerator {
-            generate(count: number, callback: RandomCallback)
+            generate(count: number, callback: RandomCallback): void;
             generateSync(count: number): string;
         }
 
