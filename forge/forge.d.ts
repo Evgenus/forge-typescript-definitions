@@ -406,4 +406,24 @@ declare module forge {
         function _expandKey(key, decrypt);
         function _updateBlock(w, input, output, decrypt)
     }
+
+    module prng {
+        interface RandomCallback {
+            (err: Error, bytes: string): void;
+        }
+
+        interface PseudoRendomGenerator {
+            generate(count: number, callback: RandomCallback)
+            generateSync(count: number): string;
+        }
+
+        function create(plugin): PseudoRendomGenerator;
+    }
+
+    interface Random extends prng.PseudoRendomGenerator {
+        getBytes(count: number, callback: prng.RandomCallback): void;
+        getBytesSync(count: number): string;
+    }
+
+    var random: Random;
 }
