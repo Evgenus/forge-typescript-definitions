@@ -326,32 +326,52 @@ declare module forge {
         function create(): HMAC;
     }
 
+    interface BlockCipherStartParams {
+        output?: util.ByteBuffer
+        iv: any; // string | number[] | ByteBuffer
+        additionalData?: string;
+        tagLength?: number;
+    }
+
+    interface PaddingFunction {
+        (blockSize: number, buffer: util.ByteBuffer, decrypt: boolean): boolean;
+    }
+
     interface Cipher {
-        start(options): void;
-        update(input): void;
-        finish(pad): boolean;
+        output: util.ByteBuffer;
+        mode: cipher.modes.BlockMode;
+        start(options: BlockCipherStartParams): void;
+        update(input: util.ByteBuffer): void;
+        finish(pad?: PaddingFunction): boolean;
     }
 
     module cipher {
-        module algorithms {
+        interface AlgorithmsDictionary {
+            [name: string]: modes.BlockModeFactory<any>;
         }
+
+        var algorithms: AlgorithmsDictionary;
 
         interface BlockCipherOptions {
             algorithm: string;
-            key
+            key: any; // string | number[] | ByteBuffer
             decrypt: boolean;
         }
 
         class BlockCipher implements Cipher {
             constructor(options: BlockCipherOptions);
-            start(options): void;
-            update(input): void;
-            finish(pad): boolean;
+
+            output: util.ByteBuffer;
+            mode: cipher.modes.BlockMode;
+            start(options: BlockCipherStartParams): void;
+            update(input: util.ByteBuffer): void;
+            finish(pad?: PaddingFunction): boolean;
         }
 
-        function createCipher(algorithm, key): BlockCipher;
-        function createDecipher(algorithm, key): BlockCipher;
+        function createCipher(algorithm: string, key: string): BlockCipher;
+        function createDecipher(algorithm: string, key: string): BlockCipher;
         function registerAlgorithm<T>(name, algorithm: modes.BlockModeFactory<T>): void;
+        function getAlgorithm(name: string): modes.BlockModeFactory<any>;
         function getAlgorithm<T>(name: string): modes.BlockModeFactory<T>;
 
         module modes {
@@ -369,14 +389,32 @@ declare module forge {
             interface BlockMode {
                 name: string;
                 cipher: Cipher;
+                blockSize: number;
+                tag: util.ByteBuffer;
                 start(options: EncryptionOptions): void;
-                encrypt(input, output): void;
-                decrypt(input, output): void;
+                encrypt(input: util.ByteBuffer, output: util.ByteBuffer): void;
+                decrypt(input: util.ByteBuffer, output: util.ByteBuffer): void;
+            }
+
+            interface PaddingOptions {
+            }
+
+            interface UnpaddingOptions {
+                overflow: number;
             }
 
             interface ECB extends BlockMode {
-                pad(input, options): boolean;
-                unpad(input, options): boolean;
+                pad(input: util.ByteBuffer, options: PaddingOptions): boolean;
+                unpad(input: util.ByteBuffer, options: UnpaddingOptions): boolean;
+            }
+
+            interface CBC extends BlockMode {
+                pad(input: util.ByteBuffer, options: PaddingOptions): boolean;
+                unpad(input: util.ByteBuffer, options: UnpaddingOptions): boolean;
+            }
+
+            interface CFB extends BlockMode {
+                afterFinish(output, options)
             }
 
             interface BlockModeFactory<T> {
@@ -384,6 +422,8 @@ declare module forge {
             }
 
             var ecb: BlockModeFactory<ECB>;
+            var cbc: BlockModeFactory<CBC>;
+            var cfb: BlockModeFactory<CFB>;
         }
     }
 
