@@ -491,25 +491,25 @@ declare module forge {
                 new (options: BlockModeOptions): BlockMode;
             }
 
-            interface ECB {
-                pad(input: util.ByteBuffer, options: { }): boolean;
-                unpad(input: util.ByteBuffer, options: { overflow: number }): boolean;
-            }
-
-            interface CBC {
+            interface ECB extends BlockMode {
                 pad(input: util.ByteBuffer, options: {}): boolean;
                 unpad(input: util.ByteBuffer, options: { overflow: number }): boolean;
             }
 
-            interface CFB {
+            interface CBC extends BlockMode {
+                pad(input: util.ByteBuffer, options: {}): boolean;
+                unpad(input: util.ByteBuffer, options: { overflow: number }): boolean;
+            }
+
+            interface CFB extends BlockMode {
                 afterFinish(output: util.ByteBuffer, options: { overflow: number }): boolean;
             }
 
-            interface OFB {
+            interface OFB extends BlockMode {
                 afterFinish(output: util.ByteBuffer, options: { overflow: number }): boolean;
             }
 
-            interface CTR {
+            interface CTR extends BlockMode {
                 afterFinish(output: util.ByteBuffer, options: { overflow: number }): boolean;
             }
 
@@ -520,7 +520,7 @@ declare module forge {
                 tag?: string;
             }
 
-            interface GCM {
+            interface GCM extends BlockMode {
                 tag: util.ByteBuffer;
 
                 start(options: GCMEncryptionOptions): void;
@@ -544,24 +544,71 @@ declare module forge {
     }
 
     module aes {
-        function startEncrypting(key: string, iv: string, output: util.ByteBuffer, mode?: string): Cipher;
+        interface sE12<T1, T2> {
+            (key: T1, iv: T2, output: util.ByteBuffer, mode?: string): Cipher;
+        }
 
-        function createEncryptionCipher(key, mode): Cipher;
-        function startDecrypting(key, iv, output, mode): Cipher;
-        function createDecryptionCipher(key, mode): Cipher;
+        interface sE1<T> extends sE12<T, string>, sE12<T, number[]>, sE12<T, util.ByteBuffer> {
+        }
 
-        interface AlgorithmOptions {
-            key: any; // string | number[] | ByteBuffer
-            decrypt: boolean;
+        interface sE extends sE1<string>, sE1<number[]>, sE1<util.ByteBuffer> {
+        }
+
+        interface cEC1<T> {
+            (key: T, mode?: string): Cipher;
+        }
+
+        interface cEC extends cEC1<string>, cEC1<number[]>, cEC1<util.ByteBuffer> {
+        }
+
+        var startEncrypting: sE;
+        var startDecrypting: sE;
+        var createEncryptionCipher: cEC;
+        var createDecryptionCipher: cEC;
+
+        interface Ai_T<T> {
+            /**
+             * Initializes this AES algorithm by expanding its key.
+             */
+            (options: { key: T; decrypt: boolean; }): void;
+        }
+
+        interface AlgorithmInitializeSignature extends Ai_T<string>, Ai_T<number[]>, Ai_T<util.ByteBuffer> {
         }
 
         class Algorithm {
-            constructor(name: string, mode);
-            initialize(options: AlgorithmOptions): void;
+            /**
+             * Creates a new AES cipher algorithm object.
+             *
+             * @param name the name of the algorithm.
+             * @param mode the mode factory function.
+             *
+             * @return the AES algorithm object.
+             */
+            constructor(name: string, mode: string);
+            initialize: AlgorithmInitializeSignature;
         }
 
-        function _expandKey(key, decrypt);
-        function _updateBlock(w, input, output, decrypt)
+        /**
+         * Expands a key. Typically only used for testing.
+         *
+         * @param {number[]} key    the symmetric key to expand, as an array of 32-bit words.
+         * @param {boolean} decrypt true to expand for decryption, false for encryption.
+         *
+         * @return the expanded key.
+         */
+        function _expandKey(key: number[], decrypt: boolean): number[];
+
+        /**
+         * Updates a single block (16 bytes) using AES. The update will either encrypt or decrypt the
+         * block.
+         *
+         * @param w       the key schedule.
+         * @param input   the input block (an array of 32-bit words).
+         * @param output  the updated output block.
+         * @param decrypt true to decrypt the block, false to encrypt it.
+         */
+        function _updateBlock(w: number[], input: number[], output: number[], decrypt: boolean): void;
     }
 
     module prng {
