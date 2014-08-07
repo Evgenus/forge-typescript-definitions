@@ -1,0 +1,30 @@
+{
+  "name": "forge-typescript-definitions",
+  "version": "0.6.13-0",
+  "description": "Typescript definitions files for Forge javascript implementation of TLS",
+  "scripts": {
+    "test": "tsc --noImplicitAny --outDir temp --module commonjs forge/forge-tests.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Evgenus/forge-typescript-definitions"
+  },
+  "keywords": [
+    "typescript",
+    "definitions",
+    "forge",
+    "crypto",
+    "cryptography",
+    "network",
+    "tls"
+  ],
+  "author": "Eugene Chernyshov <chernyshov.eugene@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Evgenus/forge-typescript-definitions/issues"
+  },
+  "homepage": "https://github.com/Evgenus/forge-typescript-definitions",
+  "devDependencies": {
+    "typescript": "^1.0.1"
+  }
+}
