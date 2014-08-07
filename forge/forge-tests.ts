@@ -62,3 +62,26 @@ function testAES(someBytes: string) {
         console.log(decipher.output.toHex());
     }
 }
+
+function testRC2(someBytes: string) {
+    // generate a random key and IV
+    var key = forge.random.getBytesSync(16);
+    var iv = forge.random.getBytesSync(8);
+
+    // encrypt some bytes
+    var cipher = forge.rc2.createEncryptionCipher(key);
+    cipher.start(iv);
+    cipher.update(forge.util.createBuffer(someBytes));
+    cipher.finish();
+    var encrypted = cipher.output;
+    // outputs encrypted hex
+    console.log(encrypted.toHex());
+
+    // decrypt some bytes
+    var cipher = forge.rc2.createDecryptionCipher(key);
+    cipher.start(iv);
+    cipher.update(encrypted);
+    cipher.finish();
+    // outputs decrypted hex
+    console.log(cipher.output.toHex());
+}
