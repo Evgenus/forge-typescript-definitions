@@ -103,15 +103,106 @@ declare module forge {
 
         var DataBuffer: DataBufferStatic;
 
-        function createBuffer(input: string, encoding?: string): ByteBuffer;
+        /**
+         * Creates a buffer that stores bytes. A value may be given to put into the buffer that is
+         * either a string of bytes or a UTF-16 string that will be encoded using UTF-8 (to do the
+         * latter, specify 'utf8' as the encoding).
+         * 
+         * @param {string=} input    (Optional) the bytes to wrap (as a string) or a UTF-16 string to
+         *                           encode as UTF-8.
+         * @param {string=} encoding (Optional) (default: 'raw', other: 'utf8').
+         *
+         * @return {ByteBuffer} The new buffer.
+         */
+        function createBuffer(input?: string, encoding?: string): ByteBuffer;
+
+        /**
+         * Fills a string with a particular value. If you want the string to be a byte string, pass in
+         * String.fromCharCode(theByte).
+         *
+         * @param {string} c the character to fill the string with, use String.fromCharCode to fill the
+         *                   string with a byte value.
+         * @param {number} n the number of characters of value c to fill with.
+         *
+         * @return {string} the filled string.
+         */
         function fillString(c: string, n: number): string;
-        function xorBytes(s1: string, s2: string, n: number);
+
+        /**
+         * Performs a per byte XOR between two byte strings and returns the result as a string of bytes.
+         *
+         * @param {string} s1 first string of bytes.
+         * @param {string} s2 second string of bytes.
+         * @param {number} n  the number of bytes to XOR.
+         *
+         * @return {string} the XOR'd result.
+         */
+        function xorBytes(s1: string, s2: string, n: number): string;
+
+        /**
+         * Converts a hex string into a 'binary' encoded string of bytes.
+         *
+         * @param {string} hex the hexadecimal string to convert.
+         *
+         * @return {string} the binary-encoded string of bytes.
+         */
         function hexToBytes(hex: string): string;
+
+        /**
+         * Converts a 'binary' encoded string of bytes to hex.
+         *
+         * @param {string} bytes the byte string to convert.
+         *
+         * @return {string} the string of hexadecimal characters.
+         */
         function bytesToHex(bytes: string): string;
+
+        /**
+         * Converts an 32-bit integer to 4-big-endian byte string.
+         *
+         * @param {number} i the integer.
+         *
+         * @return {string} the byte string.
+         */
         function int32ToBytes(i: number): string;
+
+        /**
+         * Base64 encodes a 'binary' encoded string of bytes.
+         *
+         * @param {string} input    the binary encoded string of bytes to base64-encode.
+         * @param {number=} maxline (Optional) the maximum number of encoded characters per line to use,
+         *                          defaults to none.
+         *
+         * @return {string} the base64-encoded output.
+         */
         function encode64(input: string, maxline?: number): string;
+
+        /**
+         * Base64 decodes a string into a 'binary' encoded string of bytes.
+         *
+         * @param {string} input the base64-encoded input.
+         *
+         * @return {string} the binary encoded string.
+         */
         function decode64(input: string): string;
+
+        /**
+         * UTF-8 encodes the given UTF-16 encoded string (a standard JavaScript string). Non-ASCII
+         * characters will be encoded as multiple bytes according to UTF-8.
+         *
+         * @param {string} str the string to encode.
+         *
+         * @return {string} the UTF-8 encoded string.
+         */
         function encodeUtf8(str: string): string;
+
+        /**
+         * Decodes a UTF-8 encoded string into a UTF-16 string.
+         *
+         * @param {string} str the string to decode.
+         *
+         * @return {string} the UTF-16 encoded string (standard JavaScript string).
+         */
         function decodeUtf8(str: string): string;
 
         module binary {
@@ -370,7 +461,7 @@ declare module forge {
 
         function createCipher(algorithm: string, key: string): BlockCipher;
         function createDecipher(algorithm: string, key: string): BlockCipher;
-        function registerAlgorithm(name, algorithm: modes.BlockModeFactory): void;
+        function registerAlgorithm(name: string, algorithm: modes.BlockModeFactory): void;
         function getAlgorithm(name: string): modes.BlockModeFactory;
 
         module modes {
@@ -435,8 +526,8 @@ declare module forge {
                 start(options: GCMEncryptionOptions): void;
                 afterFinish(output: util.ByteBuffer, options: { overflow: number; decrypt?: boolean }): boolean;
 
-                multiply(x: number[], y: number[]);
-                pow(x: number[], y: number[]);
+                multiply(x: number[], y: number[]): number[];
+                pow(x: number[], y: number[]): number[];
                 tableMultiply(x: number[]): number[];
                 ghash(h: number[], y: number[], x: number[]): number[];
                 generateHashTable(h: number[], bits: number): number[];
