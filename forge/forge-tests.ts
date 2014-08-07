@@ -40,7 +40,7 @@ function testAES(someBytes: string) {
     cipher.update(forge.util.createBuffer(someBytes));
     cipher.finish();
     var encrypted = cipher.output;
-    var tag = cipher.mode.tag;
+    var tag = (<forge.cipher.modes.GCM>cipher.mode).tag;
     // outputs encrypted hex
     console.log(encrypted.toHex());
     // outputs authentication tag
