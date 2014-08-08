@@ -630,4 +630,181 @@ declare module forge {
     }
 
     var random: Random;
+
+    module rc2 {
+
+
+        interface expandKey_T<T> {
+
+            /**
+             * Perform RC2 key expansion as per RFC #2268, section 2.
+             *
+             * @param {string|ByteBufer} key variable-length user key (between 1 and 128 bytes)
+             * @param {number=} effKeyBits   (Optional) number of effective key bits (default: 128)
+             *
+             * @return the expanded RC2 key (ByteBuffer of 128 bytes)
+             */
+            (key: T, effKeyBits?: number): util.ByteBuffer;
+        }
+
+        interface expandKeySignature extends expandKey_T<string>, expandKey_T<util.ByteBuffer> {
+        }
+
+        var expandKey: expandKeySignature;
+
+        interface CipherStart_T<T> {
+
+            /**
+             * Starts or restarts the encryption or decryption process, whichever was previously configured.
+             * 
+             * To use the cipher in CBC mode, iv may be given either as a string of bytes, or as a byte
+             * buffer.  For ECB mode, give null as iv.
+             *
+             * @param {?string|ByteBuffer} iv (Optional) the initialization vector to use, null for ECB mode.
+             * @param {ByteBuffer=} output    (Optional) the output the buffer to write to, null to create one.
+             */
+            (iv?: T, output?: util.ByteBuffer): void;
+        }
+
+        interface CipherStartSignature extends CipherStart_T<string>, CipherStart_T<util.ByteBuffer> {
+        }
+
+        interface Cipher {
+            output: util.ByteBuffer;
+
+            start: CipherStartSignature;
+
+            /**
+             * Updates the next block.
+             *
+             * @param input the buffer to read from.
+             */
+            update(input: util.ByteBuffer): void;
+
+            /**
+             * Finishes encrypting or decrypting.
+             *
+             * @param pad (Optional) a padding function to use, null for PKCS#7 padding, signature(blockSize,
+             *            buffer, decrypt).
+             *
+             * @return true if successful, false on error.
+             */
+            finish(pad?: PaddingFunction): boolean;
+        }
+
+        interface createCipher_T<T> {
+
+            /**
+             * Creates a RC2 cipher object.
+             *
+             * @param {string|ByteBuffer} key the symmetric key to use (as base for key generation).
+             * @param {number=} bits          (Optional) the number of effective key bits.
+             * @param {boolean=} encrypt      (Optional) false for decryption, true for encryption.
+             *
+             * @return the cipher.
+             */
+            (key: T, bits?: number, encrypt?: boolean): Cipher;
+        }
+
+        interface createCipherSignature extends createCipher_T<string>, createCipher_T<util.ByteBuffer> {
+        }
+
+        var createCipher: createCipherSignature;
+
+        interface startEncrypting_T12<T1, T2> {
+
+            /**
+             * Creates an RC2 cipher object to encrypt data in ECB or CBC mode using the given symmetric
+             * key. The output will be stored in the 'output' member of the returned cipher.
+             * 
+             * The key and iv may be given as a string of bytes or a byte buffer. The cipher is initialized
+             * to use 128 effective key bits.
+             *
+             * @param {string|ByteBuffer} key the symmetric key to use.
+             * @param {string|ByteBuffer} iv  the initialization vector to use.
+             * @param {ByteBuffer=} output    (Optional) the buffer to write to, null to create one.
+             *
+             * @return the cipher.
+             */
+            (key: T1, iv: T2, output?: util.DataBuffer): Cipher;
+        }
+
+        interface startEncrypting_T1<T1> extends startEncrypting_T12<T1, string>, startEncrypting_T12<T1, util.ByteBuffer> {
+        }
+
+        interface startEncryptingSignature extends startEncrypting_T1<string>, startEncrypting_T1<util.ByteBuffer> {
+        }
+
+        var startEncrypting: startEncryptingSignature;
+
+        interface createEncryptionCipher_T<T> {
+
+            /**
+             * Creates an RC2 cipher object to encrypt data in ECB or CBC mode using the given symmetric key.
+             * 
+             * The key may be given as a string of bytes or a byte buffer.
+             * 
+             * To start encrypting call start() on the cipher with an iv and optional output buffer.
+             *
+             * @param {string|ByteBuffer} key the symmetric key to use.
+             * @param {number=} bits          (Optional) The bits.
+             *
+             * @return the cipher.
+             */
+            (key: T, bits?: number): Cipher;
+        }
+
+        interface createEncryptionCipherSignature extends createEncryptionCipher_T<string>, createEncryptionCipher_T<util.ByteBuffer> {
+        }
+
+        var createEncryptionCipher: createEncryptionCipherSignature;
+
+        interface startDecrypting_T12<T1, T2> {
+
+            /**
+             * Creates an RC2 cipher object to decrypt data in ECB or CBC mode using the given symmetric
+             * key. The output will be stored in the 'output' member of the returned cipher.
+             * 
+             * The key and iv may be given as a string of bytes or a byte buffer. The cipher is initialized
+             * to use 128 effective key bits.
+             *
+             * @param {string|ByteBuffer} key the symmetric key to use.
+             * @param {string|ByteBuffer} iv  the initialization vector to use.
+             * @param {ByteBuffer=} output    (Optional) the buffer to write to, null to create one.
+             *
+             * @return the cipher.
+             */
+            (key: T1, iv: T2, output?: util.ByteBuffer): Cipher;
+        }
+
+        interface startDecrypting_T1<T1> extends startDecrypting_T12<T1, string>, startDecrypting_T12<T1, util.ByteBuffer> {
+        }
+
+        interface startDecryptingSignature extends startDecrypting_T1<string>, startDecrypting_T1<util.ByteBuffer> {
+        }
+
+        var startDecrypting: startDecryptingSignature;
+
+        interface createDecryptionCipher_T<T> {
+
+            /**
+             * Creates an RC2 cipher object to decrypt data in ECB or CBC mode using the given symmetric key.
+             * 
+             * The key may be given as a string of bytes or a byte buffer.
+             * 
+             * To start decrypting call start() on the cipher with an iv and optional output buffer.
+             *
+             * @param {string|ByteBuffer} key the symmetric key to use.
+             * @param {number} bits           (Optional) the bits.
+             *
+             * @return the cipher.
+             */
+            (key: T, bits?: number): Cipher;
+        }
+
+        interface createDecryptionCipherSignature extends createDecryptionCipher_T<string>, createDecryptionCipher_T<util.ByteBuffer> {
+        }
+
+        var createDecryptionCipher: createDecryptionCipherSignature;
+    }
 }
