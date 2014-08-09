@@ -1114,5 +1114,70 @@ declare module forge {
 
     module pki {
         export import rsa = forge.rsa;
+
+        /**
+         * Converts a private key from an ASN.1 object.
+         *
+         * @param obj the ASN.1 representation of a PrivateKeyInfo containing an RSAPrivateKey or an
+         *            RSAPrivateKey.
+         *
+         * @return the private key.
+         */
+        function wrapRsaPrivateKey(obj: any): rsa.PrivateKey; // TODO: maybe it is possible to specify ASN.1
+
+        /**
+         * Converts a private key to an ASN.1 RSAPrivateKey.
+         *
+         * @param key the private key.
+         *
+         * @return the ASN.1 representation of an RSAPrivateKey.
+         */
+        function privateKeyToAsn1(key: rsa.PrivateKey): any; // TODO: maybe it is possible to specify ASN.1
+
+        /**
+         * Converts a private key to an ASN.1 RSAPrivateKey.
+         *
+         * @param key the private key.
+         *
+         * @return the ASN.1 representation of an RSAPrivateKey.
+         */
+        function privateKeyToRSAPrivateKey(key: rsa.PrivateKey): any; // TODO: maybe it is possible to specify ASN.1
+
+        /**
+         * Converts a public key from an ASN.1 SubjectPublicKeyInfo or RSAPublicKey.
+         *
+         * @param obj the asn1 representation of a SubjectPublicKeyInfo or RSAPublicKey.
+         *
+         * @return the public key.
+         */
+        function publicKeyFromAsn1(obj: any): rsa.PublicKey; // TODO: maybe it is possible to specify ASN.1
+
+        /**
+         * Converts a public key to an ASN.1 SubjectPublicKeyInfo.
+         *
+         * @param key the public key.
+         *
+         * @return the asn1 representation of a SubjectPublicKeyInfo.
+         */
+        function publicKeyToAsn1(key: rsa.PublicKey): any; // TODO: maybe it is possible to specify ASN.1
+
+        /**
+         * Converts a public key to an ASN.1 SubjectPublicKeyInfo.
+         *
+         * @param key the public key.
+         *
+         * @return the asn1 representation of a SubjectPublicKeyInfo.
+         */
+        function publicKeyToSubjectPublicKeyInfo(key: rsa.PublicKey): any; // TODO: maybe it is possible to specify ASN.1
+
+        /**
+         * Converts a public key to an ASN.1 RSAPublicKey.
+         *
+         * @param key the public key.
+         *
+         * @return the asn1 representation of a RSAPublicKey.
+         */
+        function publicKeyToRSAPublicKey(key: rsa.PublicKey): any; // TODO: maybe it is possible to specify ASN.1
+    }
     }
 }
