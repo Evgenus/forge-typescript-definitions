@@ -39,8 +39,8 @@ declare module forge {
             getInt(n: number): number;
             getSignedInt(n: number): number;
 
-            getBytes(count: number): string;
-            bytes(count: number): string;
+            getBytes(count?: number): string;
+            bytes(count?: number): string;
             at(i: number): number;
             setAt(i: number, b: number): T;
             last(): number;
@@ -806,5 +806,313 @@ declare module forge {
         }
 
         var createDecryptionCipher: createDecryptionCipherSignature;
+    }
+
+    module rsa {
+
+        /**
+         * NOTE: THIS METHOD IS DEPRECATED, use 'sign' on a private key object or 'encrypt' on a public
+         * key object instead.
+         * 
+         * Performs RSA encryption.
+         * 
+         * The parameter bt controls whether to put padding bytes before the message passed in. Set bt
+         * to either true or false to disable padding completely (in order to handle e.g. EMSA-PSS
+         * encoding seperately before), signaling whether the encryption operation is a public key
+         * operation (i.e. encrypting data) or not, i.e. private key operation (data signing).
+         * 
+         * For PKCS#1 v1.5 padding pass in the block type to use, i.e. either 0x01 (for signing) or 0x02
+         * (for encryption). The key operation mode (private or public) is derived from this flag in
+         * that case).
+         *
+         * @param m   the message to encrypt as a byte string.
+         * @param key the RSA key to use.
+         * @param bt  for PKCS#1 v1.5 padding, the block type to use (0x01 for private key, 0x02 for
+         *            public), to disable padding: true = public key, false = private key.
+         *
+         * @return the encrypted bytes as a string.
+         */
+        function encrypt(m, key, bt): string;
+
+        /**
+         * NOTE: THIS METHOD IS DEPRECATED, use 'decrypt' on a private key object or 'verify' on a
+         * public key object instead.
+         * 
+         * Performs RSA decryption.
+         * 
+         * The parameter ml controls whether to apply PKCS#1 v1.5 padding or not.  Set ml = false to
+         * disable padding removal completely (in order to handle e.g. EMSA-PSS later on) and simply
+         * pass back the RSA encryption block.
+         *
+         * @param ed  the encrypted data to decrypt in as a byte string.
+         * @param key the RSA key to use.
+         * @param pub true for a public key operation, false for private.
+         * @param ml  the message length, if known, false to disable padding.
+         *
+         * @return the decrypted message as a byte string.
+         */
+        function decrypt(ed, key, pub, ml): string;
+
+        interface createKeyPairGenerationStateOptions {
+            prng?: Random;
+            algorithm?: string;
+        }
+
+        interface GenerationState {
+        }
+
+        /**
+         * Creates an RSA key-pair generation state object. It is used to allow key-generation to be
+         * performed in steps. It also allows for a UI to display progress updates.
+         *
+         * @param bits    (Optional) the size for the private key in bits, defaults to 2048.
+         * @param e       (Optional) the public exponent to use, defaults to 65537 (0x10001).
+         * @param options (Optional) the options to use. prng a custom crypto-secure pseudo-random number
+         *                  generator to use, that must define "getBytesSync". algorithm the algorithm
+         *                  to use (default: 'PRIMEINC').
+         *
+         * @return the state object to use to generate the key-pair.
+         */
+        function createKeyPairGenerationState(bits?: number, e?: number, options?: createKeyPairGenerationStateOptions): GenerationState;
+
+        /**
+         * Attempts to runs the key-generation algorithm for at most n seconds (approximately) using the
+         * given state. When key-generation has completed, the keys will be stored in state.keys.
+         * 
+         * To use this function to update a UI while generating a key or to prevent causing browser
+         * lockups/warnings, set "n" to a value other than 0. A simple pattern for generating a key and
+         * showing a progress indicator is:
+         * 
+         * var state = pki.rsa.createKeyPairGenerationState(2048);
+         * var step = function() {
+         *   // step key-generation, run algorithm for 100 ms, repeat
+         *   if(!forge.pki.rsa.stepKeyPairGenerationState(state, 100)) {
+         *     setTimeout(step, 1);
+         *   } else {
+         *     // key-generation complete // TODO: turn off progress indicator here // TODO: use the
+         *     generated key-pair in "state.keys"
+         *   }
+         * };
+         * // TODO: turn on progress indicator here setTimeout(step, 0);
+         *
+         * @param state      the state to use.
+         * @param {number} n the maximum number of milliseconds to run the algorithm for, 0 to run the
+         *                   algorithm to completion.
+         *
+         * @return true if the key-generation completed, false if not.
+         */
+        function stepKeyPairGenerationState(state: GenerationState, n: number): boolean;
+
+        interface EncryptSchemeOptions {
+        }
+
+        interface PrivateKey {
+            n: jsbn.BigInteger;
+            e: jsbn.BigInteger;
+            d: jsbn.BigInteger;
+            p: jsbn.BigInteger;
+            q: jsbn.BigInteger;
+            dP: jsbn.BigInteger;
+            dQ: jsbn.BigInteger;
+            qInv: jsbn.BigInteger;
+
+            /**
+             * Decrypts the given data with this private key. The decryption scheme must match the one used
+             * to encrypt the data.
+             *
+             * @param {string} data   the byte string to decrypt.
+             * @param {string} scheme (Optional) the decryption scheme to use: 'RSAES-PKCS1-V1_5' (default),
+             *                        'RSA-OAEP', 'RAW', 'NONE', or null to perform raw RSA decryption.
+             * @param schemeOptions   (Optional) any scheme-specific options.
+             *
+             * @return the decrypted byte string.
+             */
+            decrypt(data: string, scheme?: string, schemeOptions?: EncryptSchemeOptions): string;
+
+            /**
+             * Signs the given digest, producing a signature.
+             * 
+             * PKCS#1 supports multiple (currently two) signature schemes: RSASSA-PKCS1-V1_5 and RSASSA-PSS.
+             * 
+             * By default this implementation uses the "old scheme", i.e. RSASSA-PKCS1-V1_5. In order to
+             * generate a PSS signature, provide an instance of Forge PSS object as the scheme parameter.
+             *
+             * @param md     the message digest object with the hash to sign.
+             * @param scheme (Optional) the signature scheme to use: 'RSASSA-PKCS1-V1_5' or undefined for
+             *               RSASSA PKCS#1 v1.5, a Forge PSS object for RSASSA-PSS, 'NONE' or null for none,
+             *               DigestInfo will not be used but PKCS#1 v1.5 padding will still be used.
+             *
+             * @return the signature as a byte string.
+             */
+            sign(md: Hash<any>, scheme?: string): string;
+        }
+
+        interface PublicKey {
+            n: jsbn.BigInteger;
+            e: jsbn.BigInteger;
+
+            /**
+             * Encrypts the given data with this public key. Newer applications should use the 'RSA-OAEP'
+             * decryption scheme, 'RSAES-PKCS1-V1_5' is for legacy applications.
+             *
+             * @param {string} data    the byte string to encrypt.
+             * @param {string=} scheme (Optional) the encryption scheme to use: 'RSAES-PKCS1-V1_5' (default),
+             *                         'RSA- OAEP', 'RAW', 'NONE', or null to perform raw RSA encryption, an
+             *                         object with an 'encode' property set to a function with the signature
+             *                         'function(data, key)' that returns a binary-encoded string
+             *                         representing the encoded data.
+             * @param schemeOptions    (Optional) any scheme-specific options.
+             *
+             * @return the encrypted byte string.
+             */
+            encrypt(data: string, scheme?: string, schemeOptions?: EncryptSchemeOptions): string;
+
+            /**
+             * Verifies the given signature against the given digest.
+             * 
+             * PKCS#1 supports multiple (currently two) signature schemes: RSASSA-PKCS1-V1_5 and RSASSA-PSS.
+             * 
+             * By default this implementation uses the "old scheme", i.e. RSASSA-PKCS1-V1_5, in which case
+             * once RSA-decrypted, the signature is an OCTET STRING that holds a DigestInfo.
+             * 
+             * DigestInfo ::= SEQUENCE {
+             *   digestAlgorithm DigestAlgorithmIdentifier, digest Digest
+             * }
+             * DigestAlgorithmIdentifier ::= AlgorithmIdentifier Digest ::= OCTET STRING
+             * 
+             * To perform PSS signature verification, provide an instance of Forge PSS object as the scheme
+             * parameter.
+             *
+             * @param digest    the message digest hash to compare against the signature, as a binary-encoded
+             *                  string.
+             * @param signature the signature to verify, as a binary-encoded string.
+             * @param scheme    (Optional) signature verification scheme to use: 'RSASSA-PKCS1-V1_5' or
+             *                  undefined for RSASSA PKCS#1 v1.5, a Forge PSS object for RSASSA-PSS, 'NONE'
+             *                  or null for none, DigestInfo will not be expected, but PKCS#1 v1.5 padding
+             *                  will still be used.
+             *
+             * @return true if the signature was verified, false if not.
+             */
+            verify(digest: string, signature: string, scheme?: string): boolean;
+        }
+
+        interface KeyPair {
+            privateKey: PrivateKey;
+            publicKey: PublicKey;
+        }
+
+        interface KeyPairGenerationOptions {
+
+            /**
+             * the size for the private key in bits, (default: 2048).
+             */
+            bits?: number;
+
+            /**
+             * the public exponent to use, (default: 65537 (0x10001)).
+             */
+            e?: number;
+
+            /**
+             * the worker script URL.
+             */
+            workerScript?: string;
+
+            /**
+             * the number of web workers (if supported) to use, (default: 2).
+             */
+            workers?: number;
+
+            /**
+             * the size of the work load, ie: number of possible prime numbers for each web worker to check
+             * per work assignment, (default: 100).
+             */
+            workLoad?: number;
+
+            /**
+             * a custom crypto-secure pseudo-random number generator to use, that must define "getBytesSync".
+             */
+            prng?: Random;
+
+            /**
+             * the algorithm to use (default: 'PRIMEINC').
+             */
+            algorithm?: string;
+        }
+
+        interface KeyPairGenerationCallback {
+            (err: Error, keypair: KeyPair): void;
+        }
+
+        /**
+         * Generates an RSA public-private key pair in a single call.
+         * 
+         * To generate a key-pair in steps (to allow for progress updates and to prevent blocking or
+         * warnings in slow browsers) then use the key-pair generation state functions.
+         * 
+         * To generate a key-pair asynchronously (either through web-workers, if available, or by
+         * breaking up the work on the main thread), pass a callback function.
+         *
+         * @param options be given:
+         *                - bits the size for the private key in bits, (default: 2048).
+         *                - e the public exponent to use, (default: 65537 (0x10001)).
+         *                - workerScript the worker script URL.
+         *                - workers the number of web workers (if supported) to use (default: 2).
+         *                - workLoad the size of the work load, ie: number of possible prime numbers
+         *                for each web worker to check per work assignment, (default: 100).
+         *                - prng a custom crypto-secure pseudo-random number generator to use, that
+         *                must define "getBytesSync".
+         *                - algorithm the algorithm to use (default: 'PRIMEINC').
+         *
+         * @return an object with privateKey and publicKey properties.
+         */
+
+        // jsdoc for theese function can be written when typescript gets better
+
+        function generateKeyPair(options: KeyPairGenerationOptions): KeyPair;
+        function generateKeyPair(bits: number): KeyPair;
+        function generateKeyPair(callback: KeyPairGenerationCallback): void;
+
+        function generateKeyPair(bits: number, e: number): KeyPair;
+        function generateKeyPair(bits: number, options: KeyPairGenerationOptions): KeyPair;
+        function generateKeyPair(bits: number, callback: KeyPairGenerationCallback): void;
+        function generateKeyPair(options: KeyPairGenerationOptions, callback: KeyPairGenerationCallback): void;
+
+        function generateKeyPair(bits: number, e: number, options: KeyPairGenerationOptions): KeyPair;
+        function generateKeyPair(bits: number, e: number, callback: KeyPairGenerationCallback): void;
+        function generateKeyPair(bits: number, options: KeyPairGenerationOptions, callback: KeyPairGenerationCallback): void;
+
+        function generateKeyPair(bits: number, e: number, options: KeyPairGenerationOptions, callback: KeyPairGenerationCallback): void;
+
+        /**
+         * Sets an RSA public key from BigIntegers modulus and exponent.
+         *
+         * @param {BigInteger} n the modulus.
+         * @param {BigInteger} e the exponent.
+         *
+         * @return the public key.
+         */
+        function setRsaPublicKey(n: jsbn.BigInteger, e: jsbn.BigInteger): PublicKey;
+
+        /**
+         * Sets an RSA private key from BigIntegers modulus, exponent, primes, prime exponents, and
+         * modular multiplicative inverse.
+         *
+         * @param {BigInteger} n    the modulus.
+         * @param {BigInteger} e    the public exponent.
+         * @param {BigInteger} d    the private exponent ((inverse of e) mod n).
+         * @param {BigInteger} p    the first prime.
+         * @param {BigInteger} q    the second prime.
+         * @param {BigInteger} dP   exponent1 (d mod (p-1)).
+         * @param {BigInteger} dQ   exponent2 (d mod (q-1)).
+         * @param {BigInteger} qInv ((inverse of q) mod p)
+         *
+         * @return the private key.
+         */
+        function setRsaPrivateKey(n: jsbn.BigInteger, e: jsbn.BigInteger, d: jsbn.BigInteger, p: jsbn.BigInteger, q: jsbn.BigInteger, dP: jsbn.BigInteger, dQ: jsbn.BigInteger, qInv: jsbn.BigInteger): PrivateKey;
+    }
+
+    module pki {
+        export import rsa = forge.rsa;
     }
 }
