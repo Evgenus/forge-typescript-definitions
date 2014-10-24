@@ -1,3 +1,5 @@
+/// <reference path="../../jsbn-typescript-definitions/jsbn/jsbn.d.ts" />
+
 declare module forge {
 
     module util {
@@ -621,7 +623,7 @@ declare module forge {
             generateSync(count: number): string;
         }
 
-        function create(plugin): PseudoRendomGenerator;
+        function create(plugin: any/* TBD */): PseudoRendomGenerator;
     }
 
     interface Random extends prng.PseudoRendomGenerator {
@@ -832,7 +834,7 @@ declare module forge {
          *
          * @return the encrypted bytes as a string.
          */
-        function encrypt(m, key, bt): string;
+        function encrypt(m: util.ByteBuffer/* TBD union */, key: util.ByteBuffer/* TBD union */, bt: any /* TBD type */): string;
 
         /**
          * NOTE: THIS METHOD IS DEPRECATED, use 'decrypt' on a private key object or 'verify' on a
@@ -851,7 +853,7 @@ declare module forge {
          *
          * @return the decrypted message as a byte string.
          */
-        function decrypt(ed, key, pub, ml): string;
+        function decrypt(ed: util.ByteBuffer /* TBD union */, key: util.ByteBuffer /* TBD union */, pub: boolean, ml: number /* TBD boolean */): string;
 
         interface createKeyPairGenerationStateOptions {
             prng?: Random;
@@ -1179,5 +1181,32 @@ declare module forge {
          */
         function publicKeyToRSAPublicKey(key: rsa.PublicKey): any; // TODO: maybe it is possible to specify ASN.1
     }
+
+    module pss {
+
+        /**
+         * Creates a PSS signature scheme object.
+         * 
+         * There are several ways to provide a salt for encoding:
+         * 
+         * - Specify the saltLength only and the built-in PRNG will generate it.
+         * - Specify the saltLength and a custom PRNG with 'getBytesSync' defined that will be used.
+         * - Specify the salt itself as a forge.util.ByteBuffer.
+         *
+         * @param options the options to use
+         *                - md the message digest object to use, a forge md instance.
+         *                - mgf the mask generation function to use, a forge mgf instance.
+         *                - {number} saltLength the length of the salt in octets.
+         *                - prng the pseudo-random number generator to use to produce a salt.
+         *                - salt the salt to use when encoding.
+         *
+         * @return a signature scheme object.
+         */
+        function create(options: any /* TBD */): any;
+
+        /**
+         * @see forge.rsa.publicKeyToAsn1
+         */
+        function create<T>(md: Hash<T>, mgf: MaskGenerator, saltLength: number): any;
     }
 }
