@@ -2,6 +2,10 @@
 
 declare module forge {
 
+    export var jsbn: {
+        BigInteger: jsbn.BigIntegerFactory;
+    };
+
     module util {
         function setImmediate(func: Function): number;
         function nextTick(func: Function): number;
