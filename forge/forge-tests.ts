@@ -30,6 +30,11 @@ function testAES(someBytes: string) {
     // outputs decrypted hex
     console.log(decipher.output.toHex());
 
+    // Encryption using byte buffer key
+    var bbKey: forge.util.ByteBuffer;
+    var cipher = forge.cipher.createCipher('AES-CBC', bbKey);
+    var cipher = forge.cipher.createDecipher('AES-CBC', bbKey);
+
     // encrypt some bytes using GCM mode
     var cipher = forge.cipher.createCipher('AES-GCM', key);
     cipher.start({

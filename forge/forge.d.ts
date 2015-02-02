@@ -5,7 +5,7 @@ declare module forgeImpl {
 }
 
 declare module forge {
-
+    
     export var jsbn: {
         BigInteger: typeof forgeImpl.BigInteger;
     };
@@ -469,8 +469,16 @@ declare module forge {
             finish(pad?: PaddingFunction): boolean;
         }
 
-        function createCipher(algorithm: string, key: string): BlockCipher;
-        function createDecipher(algorithm: string, key: string): BlockCipher;
+        interface cipherSignature_T<T> {
+            (algorithm: string, key: T): BlockCipher;
+        }
+
+        interface cipherSignature extends cipherSignature_T<string>, cipherSignature_T<number[]>, cipherSignature_T<util.ByteBuffer> {
+        }
+
+        var createCipher: cipherSignature;
+        var createDecipher: cipherSignature;
+
         function registerAlgorithm(name: string, algorithm: modes.BlockModeFactory): void;
         function getAlgorithm(name: string): modes.BlockModeFactory;
 
