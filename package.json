@@ -1,6 +1,6 @@
 {
   "name": "forge-typescript-definitions",
-  "version": "0.6.13-0",
+  "version": "0.6.13-1",
   "description": "Typescript definitions files for Forge javascript implementation of TLS",
   "scripts": {
     "test": "tsc --noImplicitAny --outDir temp --module commonjs forge/forge-tests.ts"
