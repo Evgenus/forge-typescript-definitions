@@ -1,9 +1,13 @@
 /// <reference path="../../jsbn-typescript-definitions/jsbn/jsbn.d.ts" />
 
+declare module forgeImpl {
+    var BigInteger: typeof jsbn.BigInteger;
+}
+
 declare module forge {
 
     export var jsbn: {
-        BigInteger: jsbn.BigIntegerFactory;
+        BigInteger: typeof forgeImpl.BigInteger;
     };
 
     module util {
