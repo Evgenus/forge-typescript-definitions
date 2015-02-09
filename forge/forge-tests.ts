@@ -202,7 +202,19 @@ function testRSA() {
             md: forge.md.sha1.create()
         }
     });
+}
 
+function test_RSA_KEM() {
+    // generate an RSA key pair asynchronously (uses web workers if available)
+    // use workers: -1 to run a fast core estimator to optimize # of workers
+    forge.rsa.generateKeyPair({bits: 2048, workers: -1}, function(err, keypair) {
+      // keypair.privateKey, keypair.publicKey
+    });
+
+
+}
+
+function testSSH() {
     // encodes (and optionally encrypts) a private RSA key as a Putty PPK file
     forge.ssh.privateKeyToPutty(privateKey, "passphrase", "comment");
 

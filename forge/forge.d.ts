@@ -1209,7 +1209,7 @@ declare module forge {
      *
      * @return the public key.
      */
-    function setRsaPublicKey(n: jsbn.BigInteger, e: jsbn.BigInteger): PublicKey;
+    function setRsaPublicKey(n: jsbn.BigInteger, e: jsbn.BigInteger): rsa.PublicKey;
 
     /**
      * Sets an RSA private key from BigIntegers modulus, exponent, primes, prime exponents, and
@@ -1226,7 +1226,7 @@ declare module forge {
      *
      * @return the private key.
      */
-    function setRsaPrivateKey(n: jsbn.BigInteger, e: jsbn.BigInteger, d: jsbn.BigInteger, p: jsbn.BigInteger, q: jsbn.BigInteger, dP: jsbn.BigInteger, dQ: jsbn.BigInteger, qInv: jsbn.BigInteger): PrivateKey;
+    function setRsaPrivateKey(n: jsbn.BigInteger, e: jsbn.BigInteger, d: jsbn.BigInteger, p: jsbn.BigInteger, q: jsbn.BigInteger, dP: jsbn.BigInteger, dQ: jsbn.BigInteger, qInv: jsbn.BigInteger): rsa.PrivateKey;
 
     module pki {
         export import rsa = forge.rsa;
