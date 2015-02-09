@@ -1181,7 +1181,7 @@ declare module forge {
          *
          * @return the public key.
          */
-        function setRsaPublicKey(n: jsbn.BigInteger, e: jsbn.BigInteger): PublicKey;
+        function setPublicKey(n: jsbn.BigInteger, e: jsbn.BigInteger): PublicKey;
 
         /**
          * Sets an RSA private key from BigIntegers modulus, exponent, primes, prime exponents, and
@@ -1198,8 +1198,35 @@ declare module forge {
          *
          * @return the private key.
          */
-        function setRsaPrivateKey(n: jsbn.BigInteger, e: jsbn.BigInteger, d: jsbn.BigInteger, p: jsbn.BigInteger, q: jsbn.BigInteger, dP: jsbn.BigInteger, dQ: jsbn.BigInteger, qInv: jsbn.BigInteger): PrivateKey;
+        function setPrivateKey(n: jsbn.BigInteger, e: jsbn.BigInteger, d: jsbn.BigInteger, p: jsbn.BigInteger, q: jsbn.BigInteger, dP: jsbn.BigInteger, dQ: jsbn.BigInteger, qInv: jsbn.BigInteger): PrivateKey;
     }
+
+    /**
+     * Sets an RSA public key from BigIntegers modulus and exponent.
+     *
+     * @param {BigInteger} n the modulus.
+     * @param {BigInteger} e the exponent.
+     *
+     * @return the public key.
+     */
+    function setRsaPublicKey(n: jsbn.BigInteger, e: jsbn.BigInteger): PublicKey;
+
+    /**
+     * Sets an RSA private key from BigIntegers modulus, exponent, primes, prime exponents, and
+     * modular multiplicative inverse.
+     *
+     * @param {BigInteger} n    the modulus.
+     * @param {BigInteger} e    the public exponent.
+     * @param {BigInteger} d    the private exponent ((inverse of e) mod n).
+     * @param {BigInteger} p    the first prime.
+     * @param {BigInteger} q    the second prime.
+     * @param {BigInteger} dP   exponent1 (d mod (p-1)).
+     * @param {BigInteger} dQ   exponent2 (d mod (q-1)).
+     * @param {BigInteger} qInv ((inverse of q) mod p)
+     *
+     * @return the private key.
+     */
+    function setRsaPrivateKey(n: jsbn.BigInteger, e: jsbn.BigInteger, d: jsbn.BigInteger, p: jsbn.BigInteger, q: jsbn.BigInteger, dP: jsbn.BigInteger, dQ: jsbn.BigInteger, qInv: jsbn.BigInteger): PrivateKey;
 
     module pki {
         export import rsa = forge.rsa;
