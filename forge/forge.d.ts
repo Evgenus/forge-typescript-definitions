@@ -10,6 +10,8 @@ declare module forge {
         BigInteger: typeof forgeImpl.BigInteger;
     };
 
+    type ArrayBufferView = DataView|Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|Float64Array;
+
     module util {
         function setImmediate(func: Function): number;
         function nextTick(func: Function): number;
@@ -18,19 +20,102 @@ declare module forge {
         function isArrayBufferView(x: any): boolean;
 
         interface BufferInterface<T> {
+
+            /**
+             * Gets the number of bytes in this buffer.
+             *
+             * @return the number of bytes in this buffer.
+             */
             length(): number;
+
+            /**
+             * Gets whether or not this buffer is empty.
+             *
+             * @return true if this buffer is empty, false if not.
+             */
             isEmpty(): boolean;
+
+            /**
+             * Puts a byte in this buffer.
+             *
+             * @param b the byte to put.
+             *
+             * @return this buffer.
+             */
             putByte(b: number): T;
+
+            /**
+             * Puts a byte in this buffer N times.
+             *
+             * @param b the byte to put.
+             * @param n the number of bytes of value b to put.
+             *
+             * @return this buffer.
+             */            
             fillWithByte(b: number, n: number): T;
 
+            /**
+             * Puts a string into this buffer.
+             *
+             * @param str the string to put.
+             * @param [encoding] the encoding for the string (default: 'utf16').
+             *
+             * @return this buffer.
+             */
             putString(str: string): T;
 
+            /**
+             * Puts a 16-bit integer in this buffer in big-endian order.
+             *
+             * @param i the 16-bit integer.
+             *
+             * @return this buffer.
+             */
             putInt16(i: number): T;
+
+            /**
+             * Puts a 24-bit integer in this buffer in big-endian order.
+             *
+             * @param i the 24-bit integer.
+             *
+             * @return this buffer.
+             */
             putInt24(i: number): T;
+            
+            /**
+             * Puts a 32-bit integer in this buffer in big-endian order.
+             *
+             * @param i the 32-bit integer.
+             *
+             * @return this buffer.
+             */
             putInt32(i: number): T;
 
+            /**
+             * Puts a 16-bit integer in this buffer in little-endian order.
+             *
+             * @param i the 16-bit integer.
+             *
+             * @return this buffer.
+             */
             putInt16Le(i: number): T;
+
+            /**
+             * Puts a 24-bit integer in this buffer in little-endian order.
+             *
+             * @param i the 24-bit integer.
+             *
+             * @return this buffer.
+             */            
             putInt24Le(i: number): T;
+
+            /**
+             * Puts a 32-bit integer in this buffer in little-endian order.
+             *
+             * @param i the 32-bit integer.
+             *
+             * @return this buffer.
+             */
             putInt32Le(i: number): T;
 
             putInt(i: number, n: number): T;
@@ -60,40 +145,44 @@ declare module forge {
             clear(): T;
             truncate(count: number): T;
             toHex(): string;
-            toString(encoding?: number): string
+            toString(encoding?: number): string;
         }
 
         interface ByteBuffer extends BufferInterface<ByteBuffer> {
             putBytes(bytes: string): ByteBuffer;
+
+            /**
+             * Puts the given buffer into this buffer.
+             *
+             * @param buffer the buffer to put into this one.
+             *
+             * @return this buffer.
+             */
             putBuffer<T>(buffer: BufferInterface<T>): ByteBuffer;
         }
 
         interface ByteBufferStatic {
-            new (): ByteBuffer;
-            new (b: string): ByteBuffer;
-            new (b: ArrayBuffer): ByteBuffer;
-            new (b: ArrayBufferView): ByteBuffer;
-            new <T>(b: Array<T>): ByteBuffer;
-            new (b: ByteBuffer): ByteBuffer;
+            new (b?: string|ArrayBuffer|ArrayBufferView|ByteBuffer): ByteBuffer;
         }
 
         var ByteBuffer: ByteBufferStatic;
         var ByteStringBuffer: ByteBufferStatic;
 
+        type ByteBufferCompatible = string|number[]|util.ByteBuffer;
+
         interface DataBuffer extends BufferInterface<DataBuffer> {
             accommodate(amount: number, growSize?: number): DataBuffer;
 
-            putBytes(bytes: string, encoding?: string): DataBuffer;
-            putBytes(bytes: DataBuffer): DataBuffer;
-            putBytes(bytes: ArrayBuffer, encoding?: string): DataBuffer;
-            putBytes(bytes: ArrayBufferView, encoding?: string): DataBuffer;
-            putBytes<T>(bytes: Array<T>, encoding?: string): DataBuffer;
+            putBytes(bytes: string|DataBuffer|ArrayBuffer|ArrayBufferView, encoding?: string): DataBuffer;
 
-            putBuffer(bytes: string): DataBuffer;
-            putBuffer(bytes: DataBuffer): DataBuffer;
-            putBuffer(bytes: ArrayBuffer): DataBuffer;
-            putBuffer(bytes: ArrayBufferView): DataBuffer;
-            putBuffer<T>(bytes: Array<T>): DataBuffer;
+            /**
+             * Puts the given buffer into this buffer.
+             *
+             * @param buffer the buffer to put into this one.
+             *
+             * @return this buffer.
+             */
+            putBuffer<T>(bytes: BufferInterface<T>): DataBuffer;
         }
 
         interface DataBufferOptions {
@@ -104,11 +193,7 @@ declare module forge {
         }
 
         interface DataBufferStatic {
-            new (): DataBuffer;
-            new (b: string, options?: DataBufferOptions): DataBuffer;
-            new (b: DataBuffer, options?: DataBufferOptions): DataBuffer;
-            new (b: ArrayBuffer, options?: DataBufferOptions): DataBuffer;
-            new (b: ArrayBufferView, options?: DataBufferOptions): DataBuffer;
+            new (b?: string|DataBuffer|ArrayBuffer|ArrayBufferView, options?: DataBufferOptions): DataBuffer;
         }
 
         var DataBuffer: DataBufferStatic;
@@ -299,8 +384,7 @@ declare module forge {
 
         function makeRequest(reqString: string): Request;
 
-        function makeLink(path: string, query?: Object, fragment?: string): string;
-        function makeLink(path: string[], query?: Object, fragment?: string): string;
+        function makeLink(path: string|string[], query?: Object, fragment?: string): string;
         function setPath(object: Object, keys: string[], value: string): void;
         function getPath(object: Object, keys: string[], _default?: string): string;
         function deletePath(object: Object, keys: string[]): void;
@@ -409,14 +493,8 @@ declare module forge {
 
     interface HMAC {
         start(): void;
-        start<T>(md: Hash<T>): void;
-        start<T>(md: Hash<T>, key: string): void;
-        start<T>(md: Hash<T>, key: number[]): void;
-        start<T>(md: Hash<T>, key: util.ByteBuffer): void;
-        start(md: string): void;
-        start(md: string, key: string): void;
-        start(md: string, key: number[]): void;
-        start(md: string, key: util.ByteBuffer): void;
+        start<T>(md: Hash<T>, key?: util.ByteBufferCompatible): void;
+        start(md: string, key?: util.ByteBufferCompatible): void;
 
         update(bytes: string): void;
 
@@ -428,8 +506,8 @@ declare module forge {
     }
 
     interface BlockCipherStartParams {
-        output?: util.ByteBuffer
-        iv: any; // string | number[] | ByteBuffer
+        output?: util.ByteBuffer;
+        iv: string|number[]|util.ByteBuffer;
         additionalData?: string;
         tagLength?: number;
     }
@@ -455,7 +533,7 @@ declare module forge {
 
         interface BlockCipherOptions {
             algorithm: string;
-            key: any; // string | number[] | ByteBuffer
+            key: string|number[]|util.ByteBuffer;
             decrypt: boolean;
         }
 
@@ -469,15 +547,8 @@ declare module forge {
             finish(pad?: PaddingFunction): boolean;
         }
 
-        interface cipherSignature_T<T> {
-            (algorithm: string, key: T): BlockCipher;
-        }
-
-        interface cipherSignature extends cipherSignature_T<string>, cipherSignature_T<number[]>, cipherSignature_T<util.ByteBuffer> {
-        }
-
-        var createCipher: cipherSignature;
-        var createDecipher: cipherSignature;
+        function createCipher(algorithm: string, key: string|number[]|util.ByteBuffer): BlockCipher;
+        function createDecipher(algorithm: string, key: string|number[]|util.ByteBuffer): BlockCipher;
 
         function registerAlgorithm(name: string, algorithm: modes.BlockModeFactory): void;
         function getAlgorithm(name: string): modes.BlockModeFactory;
@@ -489,7 +560,7 @@ declare module forge {
             }
 
             interface EncryptionOptions {
-                iv: any; // string | number[] | ByteBuffer
+                iv: string|number[]|util.ByteBuffer
             }
 
             interface BlockMode {
