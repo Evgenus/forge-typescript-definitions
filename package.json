@@ -3,7 +3,8 @@
   "version": "0.6.13-1",
   "description": "Typescript definitions files for Forge javascript implementation of TLS",
   "scripts": {
-    "test": "tsc --noImplicitAny --outDir temp --module commonjs forge/forge-tests.ts"
+    "test": "tsc --noImplicitAny --outDir temp --module commonjs forge/forge-tests.ts",
+    "gen-docs": "typedoc --out ./docs ./forge/forge.d.ts --includeDeclarations --name \"Forge Typescript Definitions\" --verbose --gaID UA-24575561-2 --theme minimal"
   },
   "repository": {
     "type": "git",
