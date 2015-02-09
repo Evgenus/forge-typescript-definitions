@@ -202,4 +202,19 @@ function testRSA() {
             md: forge.md.sha1.create()
         }
     });
+
+    // encodes (and optionally encrypts) a private RSA key as a Putty PPK file
+    forge.ssh.privateKeyToPutty(privateKey, "passphrase", "comment");
+
+    // encodes a public RSA key as an OpenSSH file
+    forge.ssh.publicKeyToOpenSSH(publicKey, "comment");
+
+    // encodes a private RSA key as an OpenSSH file
+    forge.ssh.privateKeyToOpenSSH(privateKey, "passphrase");
+
+    // gets the SSH public key fingerprint in a byte buffer
+    forge.ssh.getPublicKeyFingerprint(publicKey);
+
+    // gets a hex-encoded, colon-delimited SSH public key fingerprint
+    forge.ssh.getPublicKeyFingerprint(publicKey, {encoding: 'hex', delimiter: ':'});
 }
