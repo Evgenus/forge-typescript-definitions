@@ -1296,4 +1296,57 @@ declare module forge {
          */
         function create<T>(md: Hash<T>, mgf: MaskGenerator, saltLength: number): any;
     }
+
+    module ssh {
+        /**
+         * Encodes (and optionally encrypts) a private RSA key as a Putty PPK file.
+         *
+         * @param privateKey the key.
+         * @param passphrase a passphrase to protect the key (falsy for no encryption).
+         * @param comment a comment to include in the key file.
+         *
+         * @return the PPK file as a string.
+         */
+        function privateKeyToPutty(privateKey: forge.rsa.PrivateKey, passphrase?: string, comment?: string): string;
+
+        /**
+         * Encodes a public RSA key as an OpenSSH file.
+         *
+         * @param key the key.
+         * @param comment a comment.
+         *
+         * @return the public key in OpenSSH format.
+         */
+        function publicKeyToOpenSSH(key: forge.rsa.PublicKey, comment?: string): string;
+
+        /**
+         * Encodes a private RSA key as an OpenSSH file.
+         *
+         * @param key the key.
+         * @param passphrase a passphrase to protect the key (falsy for no encryption).
+         *
+         * @return the public key in OpenSSH format.
+         */
+        function privateKeyToOpenSSH(privateKey: forge.rsa.PrivateKey, passphrase?: string): string;
+
+        type FingerprintOptions = {
+            md?: Hash<any>;
+            encoding?: string;
+            delimiter?: string;
+        };
+
+        /**
+         * Gets the SSH fingerprint for the given public key.
+         *
+         * @param options the options to use.
+         *          [md] the message digest object to use (defaults to forge.md.md5).
+         *          [encoding] an alternative output encoding, such as 'hex'
+         *            (defaults to none, outputs a byte buffer).
+         *          [delimiter] the delimiter to use between bytes for 'hex' encoded
+         *            output, eg: ':' (defaults to none).
+         *
+         * @return the fingerprint as a byte buffer or other encoding based on options.
+         */
+        function getPublicKeyFingerprint(key: forge.rsa.PublicKey, options?: FingerprintOptions): string;
+    }
 }
